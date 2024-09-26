@@ -27,12 +27,9 @@ class Answer {
             Fields.writeInt16BE(TTL, 4);
             Fields.writeInt16BE(RDLENGTH, 8);
             const octects = RDATA.split('.').map(Number);
-            console.log(octects);
             octects.forEach((value, index) => {
-                console.log(value, index);
                 Fields.writeInt8(value, 10 + index);
             });
-            console.log(Fields);
             return Buffer.concat([Buffer.from(encoded_domain, 'binary'), Fields]);
         }));
     }

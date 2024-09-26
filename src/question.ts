@@ -41,6 +41,7 @@ export class Question {
     static encode(questions: Question[]) {
         return Buffer.concat(questions.map((q) => {
             const { NAME, TYPE, CLASS } = q
+
             const domain = NAME.split('.');
             let encoded_domain = ``;
             domain.forEach((value) => {
@@ -49,10 +50,11 @@ export class Question {
                 encoded_domain += `${value}`;
             });
             encoded_domain += `\\x00`;
-            
+
             const typeAndClass = Buffer.alloc(4)
             typeAndClass.writeInt16BE(TYPE, 0);
             typeAndClass.writeInt16BE(CLASS, 2);
+
             return Buffer.concat([Buffer.from(encoded_domain, 'binary'), typeAndClass]);
         }))
     }

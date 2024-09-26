@@ -74,6 +74,7 @@ export class DNSHeader implements DNSMessageHeader {
     encode() {
         const header = Buffer.alloc(12);
         header.writeUInt16BE(this.ID, 0);
+
         const flags =
             (this.QR << 15) |
             (this.OPCODE << 11) |
@@ -83,11 +84,13 @@ export class DNSHeader implements DNSMessageHeader {
             (this.RA << 7) |
             (this.Z << 4) |
             this.RCODE;
+
         header.writeUInt16BE(flags, 2);
         header.writeUInt16BE(this.QDCOUNT, 4);
         header.writeUInt16BE(this.ANCOUNT, 6);
         header.writeUInt16BE(this.NSCOUNT, 8);
         header.writeUInt16BE(this.ARCOUNT, 10);
+
         return header;
     }
 

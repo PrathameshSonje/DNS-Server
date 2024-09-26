@@ -22,32 +22,47 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const dgram = __importStar(require("dgram"));
 const header_1 = require("./header");
 const question_1 = require("./question");
 const answer_1 = require("./answer");
-// You can use print statements as follows for debugging, they'll be visible when running tests.
-console.log("Logs from your program will appear here!");
+const headerParser_1 = __importDefault(require("./headerParser"));
 const udpSocket = dgram.createSocket("udp4");
-udpSocket.bind(2053, "127.0.0.1");
+udpSocket.bind(2053, "127.0.0.1", () => {
+    console.log('UDP server is running on 127.0.0.1:2053');
+});
 udpSocket.on("message", (data, remoteAddr) => {
     try {
-        console.log(data);
+        console.log('Received data:', data);
+        const { packet_id, flags } = (0, headerParser_1.default)(data);
         const header = new header_1.DNSHeader();
-        header.ID = 1234;
+        header.ID = packet_id;
+        header.OPCODE = flags.OPCODE;
+        header.RD = flags.RD;
+        header.RCODE = flags.RCODE;
+        header.QDCOUNT += 1;
+        header.ANCOUNT += 1;
+        // Encode question and answer
         const question = new question_1.Question('codecrafters.io', question_1.Qtype.A, question_1.Qclass.IN);
         const encoded_question = question_1.Question.encode([question]);
-        header.QDCOUNT += 1;
         const answer = new answer_1.Answer('codecrafters.io', question_1.Qtype.A, question_1.Qclass.IN, 60, 4, '8.8.8.8');
         const encoded_answer = answer_1.Answer.encode([answer]);
-        header.ANCOUNT += 1;
-        console.log(header, question, answer);
-        console.log(`Received data from ${remoteAddr.address}:${remoteAddr.port}`);
+        // Log encoded parts
+        console.log('Encoded DNS header:', header.encode());
+        console.log('Encoded question:', encoded_question);
+        console.log('Encoded answer:', encoded_answer);
+        // Create response buffer
         const response = Buffer.concat([header.encode(), encoded_question, encoded_answer]);
+        console.log('Response to be sent:', response);
+        // Send response
         udpSocket.send(response, remoteAddr.port, remoteAddr.address);
+        console.log(`Response sent to ${remoteAddr.address}:${remoteAddr.port}`);
     }
     catch (e) {
-        console.log(`Error sending data: ${e}`);
+        console.log(`Error sending data: ${e.message}`, e.stack);
     }
 });
