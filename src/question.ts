@@ -50,7 +50,7 @@ export class Question {
                 encoded_domain += `${value}`;
             });
             encoded_domain += `\\x00`;
-
+    
             const typeAndClass = Buffer.alloc(4)
             typeAndClass.writeInt16BE(TYPE, 0);
             typeAndClass.writeInt16BE(CLASS, 2);

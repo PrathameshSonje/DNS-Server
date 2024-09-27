@@ -1,6 +1,6 @@
 const dgram = require('dgram');
 
-const dnsQuery = Buffer.from('123401000001000000000000', 'hex');
+const dnsQuery = Buffer.from('1234010000010000000000005c783063636f646563726166746572735c783032696f5c78303000010001', 'hex');
 const client = dgram.createSocket('udp4');
 
 const serverPort = 2053;
