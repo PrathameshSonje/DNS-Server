@@ -29,7 +29,7 @@ client.on('error', (err) => {
 setTimeout(() => {
   console.log('No response received, closing socket');
   client.close();
-}, 1000);
+}, 5000);
 
 // const dgram = require('dgram');
 
